@@ -1,0 +1,9 @@
+1、Taobao chromedrive mirrors
+http://npm.taobao.org/mirrors/chromedriver
+
+2、scrapy暂停与重启
+在项目目录自动新建WorkDir
+eg：
+scrapy crawl general -s JOBDIR=WorkDir/somespider-1
+一次C-c暂停，所花时间比较长
+一次scrapy crawl general -s JOBDIR=WorkDir/somespider-1重启
