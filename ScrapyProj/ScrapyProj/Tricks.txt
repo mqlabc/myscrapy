@@ -7,3 +7,7 @@ eg：
 scrapy crawl general -s JOBDIR=WorkDir/somespider-1
 一次C-c暂停，所花时间比较长
 一次scrapy crawl general -s JOBDIR=WorkDir/somespider-1重启
+
+3、阿里云服务器也可以使用chrome，不过可能需要virtualdisplay还是什么
+
+4、git add之前才可以git diff
