@@ -110,18 +110,19 @@ class MxDownloaderMiddleware(object):
 
 class DynamicPageMiddleware(object):
     """动态网页下载，须在spider中初始化browser，可增加spider name的判断"""
+
     def process_request(self, request, spider):
         if spider.browser.name is not None:
             spider.browser.get(request.url)
             try:
-                frames=spider.browser.find_elements_by_tag_name('iframe')
-                assert len(frames)>0
-                results=[]
+                frames = spider.browser.find_elements_by_tag_name('iframe')
+                assert len(frames) > 0
+                results = []
                 for frame in frames:
                     spider.browser.switch_to.frame(frame)
                     results.append(spider.browser.page_source)
 
-                return HtmlResponse(url=spider.browser.current_url, headers={'results':results}, encoding="utf-8", request=request)
+                return HtmlResponse(url=spider.browser.current_url, headers={'results': results}, encoding="utf-8", request=request)
             except NoSuchElementException:
                 # 如何并列？
                 return HtmlResponse(url=spider.browser.current_url, body=spider.browser.page_source, encoding="utf-8", request=request)

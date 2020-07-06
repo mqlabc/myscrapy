@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-import scrapy
+import re
 import time
+import scrapy
 from ScrapyProj.items import GeneralItem
 # The previously bundled scrapy.xlib.pydispatch library was deprecated and replaced by pydispatcher.
 from pydispatch import dispatcher
 from scrapy import signals
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import re
 
 
 class GeneralSpider(scrapy.Spider):
@@ -25,14 +24,30 @@ class GeneralSpider(scrapy.Spider):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        chrome_options = Options()
-        # 指定chrome目录
-        # 加载插件；保持登录
-        chrome_options.add_argument(r"user-data-dir=C:\Users\mql\AppData\Local\Google\Chrome\User Data")
-        # chrome_options.add_argument('--headless')
-        # chrome_options.add_argument('window-size=1366,768')
-        self.browser = webdriver.Chrome(options=chrome_options)
-        # self.browser = webdriver.Chrome()
+        options = webdriver.ChromeOptions()
+
+        # 减小被识别的概率
+        options.add_experimental_option(
+            "excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            "source": """
+            Object.defineProperty(navigator, 'webdriver', {
+              get: () => undefined
+            })
+          """
+        })
+
+        # sougou微信平台可以识别headless模式，必要时不使用headless改用virtualdisplay
+        # options.add_argument('--headless')
+        display = Display(visible=0, size=(1366, 768))
+        display.start()
+
+        # 指定chrome目录:加载插件；保持登录
+        chrome_options.add_argument(
+            r"user-data-dir=C:\Users\mql\AppData\Local\Google\Chrome\User Data")
+
+        self.driver = webdriver.Chrome(options=options)
         super(GeneralSpider, self).__init__()
         dispatcher.connect(self.spider_closed, signals.spider_closed)
 
@@ -42,7 +57,8 @@ class GeneralSpider(scrapy.Spider):
         self.browser.quit()
 
     def parse(self, response):
-        level2_pages = response.xpath('//span[@class="articlename"]/a/@href').getall()
+        level2_pages = response.xpath(
+            '//span[@class="articlename"]/a/@href').getall()
         for page in level2_pages:
             yield scrapy.Request('https://mooc1-1.chaoxing.com' + page, callback=self.parse_level2)
         pass
@@ -51,7 +67,8 @@ class GeneralSpider(scrapy.Spider):
         # 有必要try
         try:
             frames = response.headers['results'].decode()
-            results = ['http://d0.ananas.chaoxing.com/download/' + i for i in re.findall('objectid="(.*?)"', frames)]
+            results = ['http://d0.ananas.chaoxing.com/download/' +
+                       i for i in re.findall('objectid="(.*?)"', frames)]
             item = GeneralItem()
             # 注意key的名称
             item['url'] = results

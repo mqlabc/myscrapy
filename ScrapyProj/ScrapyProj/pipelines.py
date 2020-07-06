@@ -4,6 +4,7 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
+from scrapy.pipelines.files import FilesPipeline
 import scrapy
 
 
@@ -48,9 +49,6 @@ class MxPipeline(object):
 #
 #     def close_spider(self, spider):
 #         self.conn.close()
-
-
-from scrapy.pipelines.files import FilesPipeline
 
 
 class MyFilesPipeline(FilesPipeline):

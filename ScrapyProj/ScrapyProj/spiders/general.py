@@ -37,10 +37,14 @@ class MxinfoSpider(scrapy.Spider):
         star_info['name'] = response.xpath(
             '//span[@class="name"]/h3/text()').get()
         star_info['url'] = response.url
-        star_info['portrait'] = response.xpath('//span[@class="photo"]/img/@src').get()
+        star_info['portrait'] = response.xpath(
+            '//span[@class="photo"]/img/@src').get()
 
-        star_info['file_urls'] = response.xpath('//ul[@class="list"]/li/a/span/img/@src').getall()
-        star_info['news_names'] = response.xpath('//ul[@class="list"]/li/span/a/h3/text()').getall()
-        star_info['news_urls'] = response.xpath('//ul[@class="list"]/li/span/a/@href').getall()
+        star_info['file_urls'] = response.xpath(
+            '//ul[@class="list"]/li/a/span/img/@src').getall()
+        star_info['news_names'] = response.xpath(
+            '//ul[@class="list"]/li/span/a/h3/text()').getall()
+        star_info['news_urls'] = response.xpath(
+            '//ul[@class="list"]/li/span/a/@href').getall()
         print(star_info)
         yield star_info
